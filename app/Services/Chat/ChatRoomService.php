@@ -43,7 +43,7 @@ class ChatRoomService
     public function createMessage(array $payload): ChatMessage
     {
         $loggedUser = auth()->user();
-        $payload['user_id'] = $loggedUser;
+        $payload['user_id'] = $loggedUser->id;
 
         return $this->chatMessage->create($payload);
     }
