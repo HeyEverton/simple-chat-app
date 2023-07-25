@@ -41,7 +41,7 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/chat', function () {
-        return Inertia::render('Chat/container');
+        return Inertia::render('Chat/Container');
     })->name('chat');
 });
 
