@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import MessageContainer from "./MessageContainer.vue";
 import InputMessage from "./InputMessage.vue";
@@ -22,9 +22,9 @@ function getRoom() {
             console.log(error);
         });
 }
+
 function setRoom(room) {
     currentRoom.value = room;
-    getMessages();
 }
 
 function getMessages() {
@@ -37,6 +37,30 @@ function getMessages() {
             console.log(error);
         });
 }
+
+function connect() {
+    if (currentRoom.value.id) {
+        let vm = this;
+        getMessages();
+        window.Echo.private("chat." + currentRoom.value.id).listen(
+            ".message.new",
+            (e) => {
+                getMessages();
+            }
+        );
+    }
+}
+
+function disconnect(room) {
+    window.Echo.leave("chat." + room.id);
+}
+
+watch(currentRoom, (val, oldVal) => {
+    if (oldVal.id) {
+        disconnect(oldVal);
+    }
+    connect();
+});
 
 getRoom();
 </script>

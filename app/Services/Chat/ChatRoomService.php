@@ -2,6 +2,7 @@
 
 namespace App\Services\Chat;
 
+use App\Events\NewChatMessage;
 use App\Models\ChatMessage;
 use App\Models\ChatRoom;
 use App\Models\User;
@@ -31,8 +32,6 @@ class ChatRoomService
      */
     public function allMessagesFromARoom(int $roomId): Collection
     {
-        // return $this->chatMessage->where('chat_room_id', '=', $roomId);
-        // test if this under works
         return $this->chatMessage->whereChatRoomId($roomId)
             ->with(['user'])
             ->orderBy('created_at', 'DESC')
@@ -45,6 +44,9 @@ class ChatRoomService
         $loggedUser = auth()->user();
         $payload['user_id'] = $loggedUser->id;
 
-        return $this->chatMessage->create($payload);
+        $message = $this->chatMessage->create($payload);
+
+        broadcast(new NewChatMessage($message))->toOthers();
+        return $message;
     }
 }
